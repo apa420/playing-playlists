@@ -1,0 +1,25 @@
+{
+    "manifest_version": 2,
+    "name": "Playing playlists",
+    "version": "0.1",
+
+    "description": "Local crossplatform playlists that you can share",
+    "homepage_url": "https://github.com/apa420/playing-playlists",
+
+    "icons":
+    {
+        "48": "icons/icon-48.png",
+        "96": "icons/icon-96.png"
+    },
+
+    "browser_action": {
+        "default_icon": "icons/icon-48.png",
+        "default_title": "Playing playlists",
+        "default_popup": "popup/menu.html"
+    },
+
+    "permissions": [
+        "storage",
+        "tabs"
+    ]
+}
