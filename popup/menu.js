@@ -27,11 +27,8 @@ let currentPlaylistName;
 
 
 importButton.onclick = () => {
-  let newTab = {};
-  newTab.url = browser.extension.getURL("misc/import.html");
-  newTab.active = true;
-  browser.tabs.create(newTab);
-  window.close();
+  let bp = browser.extension.getBackgroundPage();
+  bp.importClick();
 };
 
 exportAllButton.onclick = () => {
