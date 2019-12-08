@@ -31,6 +31,7 @@ importButton.onclick = () => {
   newTab.url = browser.extension.getURL("misc/import.html");
   newTab.active = true;
   browser.tabs.create(newTab);
+  window.close();
 };
 
 exportAllButton.onclick = () => {
@@ -69,7 +70,7 @@ newPlaylistButton.onclick = () => {
   let newName = "new playlist ";
 
   storage.get(null).then(playlistsList => {
-    let i = 0;
+    let i = 1;
     while (Object.
         getOwnPropertyNames(playlistsList)
         .includes(newName + i.toString()))
@@ -318,6 +319,9 @@ renameButton.onclick = () => {
     storage.set(newItem).then(() => {
       storage.remove(oldName);
       currentPlaylistName = newName;
+      playlistSelectorRemove(oldName);
+      playlistSelectorAdd(newName);
+      
     });
   });
 };
@@ -330,6 +334,8 @@ deleteButton.onclick = () => {
     backButton.onclick();
     playlistSelectorRemove(gettingDeleted);
     currentPlaylistName = playlistList.value;
+    tableDelete();
+    tableCreate();
   } else {
     deleteButton.firstChild.data = "Are you sure?";
   }
