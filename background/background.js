@@ -51,3 +51,5 @@ function handleFile(file) {
     }
   });
 }
+let bg = API.extension.getBackgroundPage();
+bg.importClick = importClick;

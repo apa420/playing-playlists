@@ -32,23 +32,23 @@ let currentPlaylistName;
 
 playButton.onclick = () => {
   let bp = API.extension.getBackgroundPage();
-  //bp.playVideo();
 };
 
 pauseButton.onclick = () => {
   let bp = API.extension.getBackgroundPage();
-  //bp.pauseVideo();
 };
 
 importButton.onclick = () => {
-  let bp = API.extension.getBackgroundPage();
-  console.log(bp);
-  bp.importClick();
+  if (!chrome) {
+    let bp = API.extension.getBackgroundPage();
+    bp.importClick();
+  } else {
+    // Open meme tab
+  }
 };
 
 exportAllButton.onclick = () => {
-  let storage = API.storage.local;
-  storage.get(null).then(data => {
+  storageGet(null, (data) => {
     let tempItem = document.createElement("a");
     tempItem.setAttribute('href', 'data:text/plain;charset=utf-8,'
       + encodeURIComponent(JSON.stringify(data)));
@@ -62,8 +62,7 @@ exportAllButton.onclick = () => {
 };
 
 exportPlaylistButton.onclick = () => {
-  let storage = API.storage.local;
-  storage.get(currentPlaylistName).then(data => {
+  storageGet(currentPlaylistName, (data) => {
     let tempItem = document.createElement("a");
     tempItem.setAttribute('href', 'data:text/plain;charset=utf-8,'
       + encodeURIComponent(JSON.stringify(data)));
@@ -78,10 +77,9 @@ exportPlaylistButton.onclick = () => {
 
 
 newPlaylistButton.onclick = () => {
-  let storage = API.storage.local;
   let newName = "new playlist ";
 
-  storageGet(null,(playlistsList) => {
+  storageGet(null, (playlistsList) => {
     let i = 1;
     while (Object.
         getOwnPropertyNames(playlistsList)
