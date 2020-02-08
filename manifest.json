@@ -13,7 +13,7 @@
     },
 
     "background": {
-        "scripts": ["popup/background.js"]
+        "page": "background/background.html"
     },
 
     "browser_action": {
