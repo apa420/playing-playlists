@@ -1,4 +1,6 @@
 "use strict";
+import {storageGet, storageSet} from "../modules/wrapper.js";
+var API = chrome || browser;
 
 let inputFile = document.createElement("input");
 inputFile.setAttribute("type", "file");
@@ -20,8 +22,7 @@ function handleFile(file) {
     try {
       let jsonParsed = JSON.parse(jsonText);
 
-      let storage = browser.storage.local;
-      storage.get(null).then(playlistsList => {
+      storageGet(null, (playlistsList) => {
 
         let newItems = {};
 
@@ -42,7 +43,7 @@ function handleFile(file) {
           newItems[newName] = jsonParsed[name];
         }
 
-        storage.set(newItems);
+        storageSet(newItems);
       });
 
     } catch {

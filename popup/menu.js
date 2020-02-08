@@ -1,6 +1,11 @@
 "use strict";
+var API = chrome || browser;
+import {storageGet, storageSet, storageRemove, tabsQuery} from "../modules/wrapper.js";
+
 
 // Buttons
+let playButton = document.getElementById("playButton");
+let pausebutton = document.getElementById("pauseButton");
 let addButton = document.getElementById("addButton");
 let optionsButton = document.getElementById("optionsButton");
 let backButton = document.getElementById("backButton");
@@ -25,14 +30,24 @@ let newTab;
 // Current playlist variable
 let currentPlaylistName;
 
+playButton.onclick = () => {
+  let bp = API.extension.getBackgroundPage();
+  //bp.playVideo();
+};
+
+pauseButton.onclick = () => {
+  let bp = API.extension.getBackgroundPage();
+  //bp.pauseVideo();
+};
 
 importButton.onclick = () => {
-  let bp = browser.extension.getBackgroundPage();
+  let bp = API.extension.getBackgroundPage();
+  console.log(bp);
   bp.importClick();
 };
 
 exportAllButton.onclick = () => {
-  let storage = browser.storage.local;
+  let storage = API.storage.local;
   storage.get(null).then(data => {
     let tempItem = document.createElement("a");
     tempItem.setAttribute('href', 'data:text/plain;charset=utf-8,'
@@ -47,7 +62,7 @@ exportAllButton.onclick = () => {
 };
 
 exportPlaylistButton.onclick = () => {
-  let storage = browser.storage.local;
+  let storage = API.storage.local;
   storage.get(currentPlaylistName).then(data => {
     let tempItem = document.createElement("a");
     tempItem.setAttribute('href', 'data:text/plain;charset=utf-8,'
@@ -63,10 +78,10 @@ exportPlaylistButton.onclick = () => {
 
 
 newPlaylistButton.onclick = () => {
-  let storage = browser.storage.local;
+  let storage = API.storage.local;
   let newName = "new playlist ";
 
-  storage.get(null).then(playlistsList => {
+  storageGet(null,(playlistsList) => {
     let i = 1;
     while (Object.
         getOwnPropertyNames(playlistsList)
@@ -76,7 +91,7 @@ newPlaylistButton.onclick = () => {
     }
     let newItem = {};
     newItem[newName + i.toString()] = [];
-    storage.set(newItem);
+    storageSet(newItem);
 
     currentPlaylistName = newName + i.toString();
     playlistSelectorAdd(currentPlaylistName);
@@ -93,7 +108,6 @@ playlistList.onchange = () => {
 searchBox.onkeyup = () => {
   let regex = new RegExp(searchBox.value);
   let children = document.getElementById("createdTable").firstChild.children;
-
   for (let i = 0; i < children.length; i++) {
 
     if (children[i].children[0].textContent
@@ -120,8 +134,7 @@ function tableDelete() {
 
 function removeButtonCallback(e) {
   var event = Object.assign({},e);
-  let storage = browser.storage.local;
-  storage.get(currentPlaylistName).then(playlist => {
+  storageGet(currentPlaylistName, (playlist) => {
 
     let value = playlist[currentPlaylistName] || [];
 
@@ -135,7 +148,7 @@ function removeButtonCallback(e) {
 
     let newItem = {};
     newItem[currentPlaylistName] = value;
-    storage.set(newItem);
+    storageSet(newItem);
     e.target.parentNode.parentNode.remove();
   });
 };
@@ -177,9 +190,7 @@ function tableCreate() {
   tbl.setAttribute("id", "createdTable");
   tblBody.setAttribute("id", "tbody");
 
-  let storage = browser.storage.local;
-
-  storage.get(currentPlaylistName).then(playlist => {
+  storageGet(currentPlaylistName, (playlist) => {
     let value = playlist[currentPlaylistName] || [];
 
     for (let i = 0; i < value.length; i++) {
@@ -213,15 +224,14 @@ function tableCreate() {
 };
 
 function addPlayListEntry() {
-  let storage = browser.storage.local;
-  browser.tabs.query({active: true, currentWindow: true}).then(tabs => {
+  tabsQuery({active: true, currentWindow: true},(tabs) => {
 
     let tab = tabs[0];
     let url = tab.url;
     let title = tab.title;
     let time = Date.now();
 
-    storage.get(currentPlaylistName).then(playlist => {
+    storageGet(currentPlaylistName, (playlist) => {
 
       let value = playlist[currentPlaylistName] || [];
 
@@ -230,17 +240,16 @@ function addPlayListEntry() {
         value.push({title: title, url: url, time: time});
         let newItem = {};
         newItem[currentPlaylistName] = value;
-        storage.set(newItem);
+        storageSet(newItem);
         tableUpdate(title, url);
       }
     });
   });
 };
 
-function playlistSelectionPopulate() {
-  let storage = browser.storage.local;
 
-  storage.get(null).then(playlistsList => {
+function playlistSelectionPopulate() {
+  storageGet(null, (playlistsList) => {
     for (let name in playlistsList) {
       let option = document.createElement("option");
       option.value = name;
@@ -304,8 +313,7 @@ renameButton.onclick = () => {
   if (newName == "") {
     return;
   }
-  let storage = browser.storage.local;
-  storage.get(null).then(playlistsList => {
+  storageGet(null, (playlistsList) => {
     for (let name in playlistsList) {
       if (newName == name) {
         return;
@@ -313,8 +321,8 @@ renameButton.onclick = () => {
     }
     let newItem = {};
     newItem[newName] = playlistsList[oldName];
-    storage.set(newItem).then(() => {
-      storage.remove(oldName);
+    storageSet(newItem, () => {
+      storageRemove(oldName);
       currentPlaylistName = newName;
       playlistSelectorRemove(oldName);
       playlistSelectorAdd(newName);
@@ -326,8 +334,7 @@ renameButton.onclick = () => {
 deleteButton.onclick = () => {
   if (deleteButton.firstChild.data == "Are you sure?"){
     let gettingDeleted = currentPlaylistName;
-    let storage = browser.storage.local;
-    storage.remove(gettingDeleted);
+    storageRemove(gettingDeleted);
     backButton.onclick();
     playlistSelectorRemove(gettingDeleted);
     currentPlaylistName = playlistList.value;

@@ -12,6 +12,11 @@ body {
   width: 600px;
 }
 
+#playerControls {
+  display: flex;
+  height: 20px;
+}
+
 #topRow {
   display: flex;
   align-items: center;
