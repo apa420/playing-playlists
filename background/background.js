@@ -5,6 +5,16 @@ var API = chrome || browser;
 let inputFile = document.createElement("input");
 inputFile.setAttribute("type", "file");
 
+let currentPlaylistName;
+
+function setCurrentPlaylistName(name) {
+  currentPlaylistName = name;
+}
+
+function getCurrentPlaylistName() {
+  return currentPlaylistName;
+}
+
 inputFile.onchange = () => {
   for (let i = 0; i < inputFile.files.length; i++) {
     handleFile(inputFile.files[i]);
@@ -53,3 +63,5 @@ function handleFile(file) {
 }
 let bg = API.extension.getBackgroundPage();
 bg.importClick = importClick;
+bg.setCurrentPlaylistName = setCurrentPlaylistName;
+bg.getCurrentPlaylistName = getCurrentPlaylistName;

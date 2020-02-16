@@ -1,7 +1,10 @@
 "use strict";
 var API = chrome || browser;
 import {storageGet, storageSet, storageRemove, tabsQuery} from "../modules/wrapper.js";
+import {newPlaylist} from "../modules/table.js"
 
+// Background page
+let bg = API.extension.getBackgroundPage();
 
 // Buttons
 let playButton = document.getElementById("playButton");
@@ -28,20 +31,22 @@ let newTab;
 
 //TODO: Add sort to table
 // Current playlist variable
-let currentPlaylistName;
+//let currentPlaylistName;
 
 playButton.onclick = () => {
-  let bp = API.extension.getBackgroundPage();
+  //let bp = API.extension.getBackgroundPage();
+  API.tabs.create({
+      url: "../play/page.html"
+    });
 };
 
 pauseButton.onclick = () => {
-  let bp = API.extension.getBackgroundPage();
+  //let bp = API.extension.getBackgroundPage();
 };
 
 importButton.onclick = () => {
   if (browser) {
-    let bp = API.extension.getBackgroundPage();
-    bp.importClick();
+    bg.importClick();
   } else {
     // Open meme tab
   }
@@ -62,7 +67,7 @@ exportAllButton.onclick = () => {
 };
 
 exportPlaylistButton.onclick = () => {
-  storageGet(currentPlaylistName, (data) => {
+  storageGet(bg.getCurrentPlaylistName(), (data) => {
     let tempItem = document.createElement("a");
     tempItem.setAttribute('href', 'data:text/plain;charset=utf-8,'
       + encodeURIComponent(JSON.stringify(data)));
@@ -77,6 +82,7 @@ exportPlaylistButton.onclick = () => {
 
 
 newPlaylistButton.onclick = () => {
+  /*
   let newName = "new playlist ";
 
   storageGet(null, (playlistsList) => {
@@ -95,10 +101,17 @@ newPlaylistButton.onclick = () => {
     playlistSelectorAdd(currentPlaylistName);
     playlistList.onchange();
   });
+  */
+  newPlaylist();
+  console.log("penis");
+  console.log(bg.getCurrentPlaylistName());
+  playlistSelectorAdd(bg.getCurrentPlaylistName());
+  playlistList.onchange();
 };  
 
 playlistList.onchange = () => {
-  currentPlaylistName = playlistList.value;
+  bg.setCurrentPlaylistName(playlistList.value);
+  //currentPlaylistName = playlistList.value;
   tableDelete();
   tableCreate();
 };
@@ -132,9 +145,10 @@ function tableDelete() {
 
 function removeButtonCallback(e) {
   var event = Object.assign({},e);
-  storageGet(currentPlaylistName, (playlist) => {
+  let pln = bg.getCurrentPlaylistName();
+  storageGet(pln, (playlist) => {
 
-    let value = playlist[currentPlaylistName] || [];
+    let value = playlist[pln] || [];
 
     for (let i = 0; i < value.length; i++) {
       if (value[i].url == e.target.parentNode.parentNode
@@ -145,7 +159,7 @@ function removeButtonCallback(e) {
     }
 
     let newItem = {};
-    newItem[currentPlaylistName] = value;
+    newItem[pln] = value;
     storageSet(newItem);
     e.target.parentNode.parentNode.remove();
   });
@@ -188,8 +202,9 @@ function tableCreate() {
   tbl.setAttribute("id", "createdTable");
   tblBody.setAttribute("id", "tbody");
 
-  storageGet(currentPlaylistName, (playlist) => {
-    let value = playlist[currentPlaylistName] || [];
+  let pln = bg.getCurrentPlaylistName();
+  storageGet(pln, (playlist) => {
+    let value = playlist[pln] || [];
 
     for (let i = 0; i < value.length; i++) {
       var tr = document.createElement("tr");
@@ -229,15 +244,16 @@ function addPlayListEntry() {
     let title = tab.title;
     let time = Date.now();
 
-    storageGet(currentPlaylistName, (playlist) => {
+    let pln = bg.getCurrentPlaylistName();
+    storageGet(pln, (playlist) => {
 
-      let value = playlist[currentPlaylistName] || [];
+      let value = playlist[pln] || [];
 
       if (!value.map(a => a.url).includes(url)) {
 
         value.push({title: title, url: url, time: time});
         let newItem = {};
-        newItem[currentPlaylistName] = value;
+        newItem[pln] = value;
         storageSet(newItem);
         tableUpdate(title, url);
       }
@@ -254,7 +270,8 @@ function playlistSelectionPopulate() {
       option.append(document.createTextNode(name));
       playlistList.appendChild(option);
     }
-    currentPlaylistName = playlistList.value;
+    bg.setCurrentPlaylistName(playlistList.value);
+    //currentPlaylistName = playlistList.value;
   });
 }
 
@@ -265,7 +282,7 @@ function playlistSelectorAdd(itemName) {
   option.append(document.createTextNode(itemName));
 
   playlistList.appendChild(option);
-  playlistList.value = currentPlaylistName;
+  playlistList.value = bg.getCurrentPlaylistName();
 }
 
 function playlistSelectorRemove(itemName) {
@@ -286,7 +303,7 @@ optionsButton.onclick = () => {
 
   let optionsMenu = document.getElementById("optionsMenu");
   optionsMenu.style.display = "flex";
-  renameInput.value = currentPlaylistName;
+  renameInput.value = bg.getCurrentPlaylistName();
   deleteButton.firstChild.data = "Delete";
 
   let importExport = document.getElementById("importExport");
@@ -307,7 +324,7 @@ backButton.onclick = () => {
 
 renameButton.onclick = () => {
   let newName = renameInput.value;
-  let oldName = currentPlaylistName;
+  let oldName = bg.getCurrentPlaylistName();
   if (newName == "") {
     return;
   }
@@ -321,7 +338,8 @@ renameButton.onclick = () => {
     newItem[newName] = playlistsList[oldName];
     storageSet(newItem, () => {
       storageRemove(oldName);
-      currentPlaylistName = newName;
+      bg.setCurrentPlaylistName(newName);
+      //currentPlaylistName = newName;
       playlistSelectorRemove(oldName);
       playlistSelectorAdd(newName);
       
@@ -331,11 +349,11 @@ renameButton.onclick = () => {
 
 deleteButton.onclick = () => {
   if (deleteButton.firstChild.data == "Are you sure?"){
-    let gettingDeleted = currentPlaylistName;
+    let gettingDeleted = bg.getCurrentPlaylistName();
     storageRemove(gettingDeleted);
     backButton.onclick();
     playlistSelectorRemove(gettingDeleted);
-    currentPlaylistName = playlistList.value;
+    bg.setCurrentPlaylistName(playlistList.value);
     tableDelete();
     tableCreate();
   } else {
