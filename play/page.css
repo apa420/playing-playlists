@@ -1,0 +1,15 @@
+body {
+  display: flex;
+  /*flex-direction: row;*/
+  align-content: center;
+  flex-wrap: nowrap;
+  height: 100%;
+}
+
+#embed {
+  flex-width: 60%;
+}
+
+.hidden {
+  display: none;
+}
