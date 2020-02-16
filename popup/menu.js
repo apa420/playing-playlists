@@ -39,7 +39,7 @@ pauseButton.onclick = () => {
 };
 
 importButton.onclick = () => {
-  if (!chrome) {
+  if (browser) {
     let bp = API.extension.getBackgroundPage();
     bp.importClick();
   } else {
