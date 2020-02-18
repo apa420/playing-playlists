@@ -26,6 +26,7 @@ function createNicoEmbed(url) {
   iframe.setAttribute("src", url);
   iframe.setAttribute("scrolling", "no");
   iframe.setAttribute("frameborder", "no");
+  iframe.setAttribute("allow", "autoplay; controls; encrtypted-media; picture-in-picture; allowfullscreen");
   body.appendChild(iframe);
 }
 
@@ -37,6 +38,6 @@ playlistSelectionPopulate().then(() => {
 //createEmbed("https://www.youtube.com/embed/r9NGooYSeXU?autoplay=1");
 // doesn't work
 // createEmbed("https://www.youtube.com/embed/r9NGooYSeXU");
-createNicoEmbed("http://embed.nicovideo.jp/watch/sm2057168")
+createNicoEmbed("http://embed.nicovideo.jp/watch/sm2057168?autoplay=1")
 //createNicoEmbed("http://ext.nicovideo.jp/thumb_watch/sm2057168");
 //createNicoEmbed("http://embed.nicovideo.jp/watch/sm2057168/script?w=640&h=360")
