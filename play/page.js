@@ -20,10 +20,13 @@ function createEmbed(url) {
 
 function createNicoEmbed(url) {
   var body = document.getElementById("embed");
-  var script = document.createElement("script");
-  script.setAttribute("type", "text/javascript");
-  script.setAttribute("src", url);
-  body.appendChild(script);
+  var iframe = document.createElement("iframe");
+  iframe.setAttribute("width", "100%");
+  iframe.setAttribute("height", "720");
+  iframe.setAttribute("src", url);
+  iframe.setAttribute("scrolling", "no");
+  iframe.setAttribute("frameborder", "no");
+  body.appendChild(iframe);
 }
 
 playlistSelectionPopulate().then(() => {
@@ -31,9 +34,9 @@ playlistSelectionPopulate().then(() => {
 });
 
 //createEmbed("https://github.com/apa420");
-createEmbed("https://www.youtube.com/embed/r9NGooYSeXU?autoplay=1");
+//createEmbed("https://www.youtube.com/embed/r9NGooYSeXU?autoplay=1");
 // doesn't work
 // createEmbed("https://www.youtube.com/embed/r9NGooYSeXU");
-//createNicoEmbed("http://embed.nicovideo.jp/watch/sm2057168?autoplay=1")
+createNicoEmbed("http://embed.nicovideo.jp/watch/sm2057168")
 //createNicoEmbed("http://ext.nicovideo.jp/thumb_watch/sm2057168");
 //createNicoEmbed("http://embed.nicovideo.jp/watch/sm2057168/script?w=640&h=360")
